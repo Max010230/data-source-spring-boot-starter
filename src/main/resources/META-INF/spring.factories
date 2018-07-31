@@ -1,2 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
- me.wuxingxing.multi.annotation.MultiDynamicDataSource
+ me.wuxingxing.multi.config.DynamicDataSourceConfig
