@@ -43,7 +43,7 @@ dependencies {
     compile('org.springframework.boot:spring-boot-starter-jdbc')
     compile "org.mybatis.spring.boot:mybatis-spring-boot-starter:1.3.1"
     compile "org.springframework.boot:spring-boot-configuration-processor"
-//    annotationProcessor"org.springframework.boot:spring-boot-configuration-processor"
+    annotationProcessor"org.springframework.boot:spring-boot-configuration-processor"
     testCompile('org.springframework.boot:spring-boot-starter-test')
 }
 // 指定上传的路径

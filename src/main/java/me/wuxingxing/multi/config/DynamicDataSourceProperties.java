@@ -12,13 +12,13 @@ import java.util.Map;
 @ConfigurationProperties(prefix = "me.wuxingxing.dynamic")
 public class DynamicDataSourceProperties {
 
-    Map<String, Map<String, Object>> datasource = new HashMap<>();
+    Map<String, DataSourceProperties> datasource = new HashMap<>();
 
     String mapperLocations;
 
     String configLocation;
 
-    public Map<String, Map<String, Object>> getDatasource() {
+    public Map<String, DataSourceProperties> getDatasource() {
         return this.datasource;
     }
 

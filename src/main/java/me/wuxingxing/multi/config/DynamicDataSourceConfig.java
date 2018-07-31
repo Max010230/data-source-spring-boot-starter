@@ -15,6 +15,7 @@ import org.springframework.boot.context.properties.source.ConfigurationPropertyN
 import org.springframework.boot.context.properties.source.ConfigurationPropertySource;
 import org.springframework.boot.context.properties.source.MapConfigurationPropertySource;
 import org.springframework.boot.jdbc.DataSourceBuilder;
+import org.springframework.cglib.beans.BeanMap;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.DefaultResourceLoader;
@@ -47,7 +48,7 @@ public class DynamicDataSourceConfig {
     @Bean(name = "dynamicDataSource")
     public DataSource DataSourceBuild() {
         MultiDynamicDataSource multiDynamicDataSource = new MultiDynamicDataSource();
-        Map<String, Object> defaultDatasource = properties.getDatasource().getOrDefault("default", null);
+        DataSourceProperties defaultDatasource = properties.getDatasource().getOrDefault("default", null);
         if (defaultDatasource != null) {
             multiDynamicDataSource.setDefaultTargetDataSource(buildDataSource(defaultDatasource));
         }
@@ -80,15 +81,32 @@ public class DynamicDataSourceConfig {
     }
 
     @SuppressWarnings("unchecked")
-    public DataSource buildDataSource(Map<String, Object> dsMap) {
-        Object type = dsMap.get("type");
+    public DataSource buildDataSource(DataSourceProperties dataSourceProperties) {
+        Map<String, Object> map = beanToMap(dataSourceProperties);
+        Object type = map.get("type");
         if (type == null) {
             // 默认DataSource
-            dsMap.put("type", DATASOURCE_TYPE_DEFAULT);
+            map.put("type", DATASOURCE_TYPE_DEFAULT);
         }
         DataSource dataSource = DataSourceBuilder.create().build();
-        bind(dataSource, dsMap);
+        bind(dataSource, map);
         return dataSource;
+    }
+
+    /**
+     * 将对象装换为map
+     * @param bean
+     * @return
+     */
+    public static <T> Map<String, Object> beanToMap(T bean) {
+        Map<String, Object> map = new HashMap<>();
+        if (bean != null) {
+            BeanMap beanMap = BeanMap.create(bean);
+            for (Object key : beanMap.keySet()) {
+                map.put(key+"", beanMap.get(key));
+            }
+        }
+        return map;
     }
 
     /**
