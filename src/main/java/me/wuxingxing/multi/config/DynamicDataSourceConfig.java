@@ -1,11 +1,10 @@
 package me.wuxingxing.multi.config;
 
+import com.zaxxer.hikari.HikariDataSource;
 import me.wuxingxing.multi.annotation.DynamicDataSourceAspect;
 import me.wuxingxing.multi.annotation.MultiDynamicDataSource;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.context.properties.bind.Bindable;
@@ -14,7 +13,6 @@ import org.springframework.boot.context.properties.source.ConfigurationPropertyN
 import org.springframework.boot.context.properties.source.ConfigurationPropertyNameAliases;
 import org.springframework.boot.context.properties.source.ConfigurationPropertySource;
 import org.springframework.boot.context.properties.source.MapConfigurationPropertySource;
-import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.cglib.beans.BeanMap;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -34,15 +32,8 @@ import java.util.Map;
 @EnableConfigurationProperties(DynamicDataSourceProperties.class)
 public class DynamicDataSourceConfig {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DynamicDataSourceConfig.class);
-
     @Autowired
     private DynamicDataSourceProperties properties;
-
-    /**
-     * 如配置文件中未指定数据源类型，使用该默认值
-     */
-    private static final Object DATASOURCE_TYPE_DEFAULT = "com.zaxxer.hikari.HikariDataSource";
 
 
     @Bean(name = "dynamicDataSource")
@@ -80,17 +71,8 @@ public class DynamicDataSourceConfig {
         return bean.getObject();
     }
 
-    @SuppressWarnings("unchecked")
     public DataSource buildDataSource(DataSourceProperties dataSourceProperties) {
-        Map<String, Object> map = beanToMap(dataSourceProperties);
-        Object type = map.get("type");
-        if (type == null) {
-            // 默认DataSource
-            map.put("type", DATASOURCE_TYPE_DEFAULT);
-        }
-        DataSource dataSource = DataSourceBuilder.create().build();
-        bind(dataSource, map);
-        return dataSource;
+        return new HikariDataSource(dataSourceProperties);
     }
 
     /**
